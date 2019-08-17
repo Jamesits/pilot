@@ -1,0 +1,3 @@
+[submodule "gobgp"]
+	path = gobgp
+	url = https://github.com/osrg/gobgp.git

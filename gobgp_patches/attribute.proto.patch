@@ -1,0 +1,7 @@
+index 4cf844f..7bf9452 100644
+--- a/api/attribute.proto
++++ b/api/attribute.proto
+@@ -24,2 +24,2 @@
+-import "any/any.proto";
++import "google/protobuf/any.proto";
+ import "gobgp.proto";

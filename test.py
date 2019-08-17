@@ -8,9 +8,9 @@ sys.path.append('./gobgp_interface')
 import grpc
 from google.protobuf.any_pb2 import Any
 
-import gobgp_pb2
-import gobgp_pb2_grpc
-import attribute_pb2
+from gobgp_interface import gobgp_pb2
+from gobgp_interface import gobgp_pb2_grpc
+from gobgp_interface import attribute_pb2
 
 _TIMEOUT_SECONDS = 1000
 

@@ -2,6 +2,9 @@
 set -Eeuo pipefail
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
+
+python3 -m pip install --user -r requirements-build.txt
+
 ! rm -rf gobgp_interface
 mkdir -p gobgp_interface
 pushd gobgp

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }} - Pilot</title>
+
+    <link rel="stylesheet" href="static/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="static/css/site.css" />
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="{{ url_for('gobgp_web.index') }}" class="navbar-brand">Pilot</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="{{ url_for('gobgp_web.index') }}">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('users.logout') }}"">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('users.register') }}"">Register</a></li>
+                        <li><a href="{{ url_for('users.login') }}">Login</a></li>
+                    {% endif %}
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <partial name="_CookieConsentPartial" />
+    <!-- flash messages -->
+    {% for info_message in get_flashed_messages() %}
+    <nav id="cookieConsent" class="navbar navbar-default navbar-fixed-top" role="alert">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cookieConsent .navbar-collapse">
+                    <span class="sr-only">Toggle flash message banner</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></span>
+            </div>
+            <div class="collapse navbar-collapse">
+                <p class="navbar-text">
+                    {{ info_message }}
+                </p>
+                <div class="navbar-right">
+                    <a asp-controller="Home" asp-action="Privacy" class="btn btn-info navbar-btn">Learn More</a>
+                    <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@cookieString">Accept</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>
+        (function () {
+            document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click", function (el) {
+                document.cookie = el.target.dataset.cookieString;
+                document.querySelector("#cookieConsent").classList.add("hidden");
+            }, false);
+        })();
+    </script>
+    {% endfor %}
+
+    <div class="container body-content">
+        <!-- child template -->
+        {% block content %}
+        {% endblock %}
+        <hr />
+        <footer>
+            <p>&copy; 2019 - Pilot</p>
+        </footer>
+    </div>
+
+    <script src="static/lib/jquery/dist/jquery.js"></script>
+    <script src="static/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="static/js/site.js"></script>
+    <script src="static/js/site.min.js"></script>
+    <script src="static/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="static/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+</body>
+</html>

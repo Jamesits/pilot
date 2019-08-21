@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% set title = 'Homepage' %}
+
+{% block content %}
+    <br>
+    <br>
+    <br>
+    <p>Your IP address: {{ ip }}</p>
+    <div><pre>
+        {% for route in routes %}
+            {{route.destination.prefix}}
+        {% endfor %}
+    </pre></div>
+{% endblock %}

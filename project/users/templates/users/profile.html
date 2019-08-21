@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% set title = 'User Profile' %}
+
+{% block content %}
+    {% if current_user %}
+        <h3>Welcome {{ current_user.email }}!</h3>
+        <a href="{{ url_for('users.logout') }}">Log Out</a>
+    {% else %}
+        <h3>Welcome!</h3>
+    {% endif %}
+{% endblock %}

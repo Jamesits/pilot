@@ -51,7 +51,7 @@ jobs:
 
     - bash: |
         sudo -EH env "PATH=$PATH" scripts/build_grpc.sh
-        cp -r gobgp_interface/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+        cp -r pilot/gobgp_interface/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
       displayName: 'Build'
 
     - task: PublishBuildArtifacts@1

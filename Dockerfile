@@ -1,6 +1,9 @@
 FROM golang:1-buster as grpc_interface_builder
+
 COPY . /pilot
 WORKDIR /pilot
+RUN apt-get update -y \
+    && apt-get install python3 python3-pip python3-setuptools
 RUN ./scripts/build_grpc.sh
 
 FROM python:3-buster

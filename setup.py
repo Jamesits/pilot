@@ -3,6 +3,14 @@ from setuptools import setup, find_packages
 with open("README.md", 'r') as f:
     long_description = f.read()
 
+# https://stackoverflow.com/a/50368460/2646069
+with open('requirements.txt', 'r') as f:
+    install_reqs = [
+        s for s in [
+            line.split('#', 1)[0].strip(' \t\n') for line in f
+        ] if s != ''
+    ]
+
 setup(
     name='pilot',
     version='0.0.1',
@@ -14,7 +22,7 @@ setup(
     author_email='pypi@public.swineson.me',
     url="https://github.com/Jamesits/Pilot",
     packages=find_packages(),
-    install_requires=[],
+    install_requires=install_reqs,
     entry_points={
         'console_scripts': [
             'pilot_server=pilot.__main__:main'

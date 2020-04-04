@@ -98,7 +98,7 @@ jobs:
       continueOnError: true
 
     - script: |
-        flake8 --ignore=E501,F401 .
+        flake8 --ignore=E501,F401 --exclude=".git,__pycache__,docs/source/conf.py,old,build,dist,gobgp,pilot/gobgp_interface" .
       displayName: 'flake8 check'
       continueOnError: true
 

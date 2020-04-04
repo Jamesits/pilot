@@ -4,7 +4,7 @@ with open("README.md", 'r') as f:
     long_description = f.read()
 
 setup(
-    name='Pilot',
+    name='pilot',
     version='0.0.1',
     description='BGP flowspec based SDN controller at home',
     license="Proprietary",
@@ -17,7 +17,7 @@ setup(
     install_requires=[],
     entry_points={
         'console_scripts': [
-            'pilot_server=Pilot.__main__:main'
+            'pilot_server=pilot.__main__:main'
         ]
     }
 )

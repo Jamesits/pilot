@@ -1,16 +1,14 @@
+import sys
+
 from flask import current_app as app
 
-import sys
 sys.path.append('./gobgp_interface')
 
 import grpc
-from google.protobuf.any_pb2 import Any
 
-from gobgp_interface import gobgp_pb2
-from gobgp_interface import gobgp_pb2_grpc
-from gobgp_interface import attribute_pb2
+from pilot.gobgp_interface import gobgp_pb2
+from pilot.gobgp_interface import gobgp_pb2_grpc
 
-from google.protobuf.json_format import MessageToJson, MessageToDict
 from protobuf_to_dict import protobuf_to_dict
 
 def get_peers():

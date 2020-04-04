@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-BUILD_DST="gobgp_interface"
+BUILD_DST="pilot/gobgp_interface"
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"/..
 

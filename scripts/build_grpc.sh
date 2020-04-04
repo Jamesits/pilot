@@ -1,12 +1,14 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-cd "$( dirname "${BASH_SOURCE[0]}" )"
+BUILD_DST="gobgp_interface"
 
-python3 -m pip install --user -r requirements-build.txt
+cd "$( dirname "${BASH_SOURCE[0]}" )"/..
 
-! rm -rf gobgp_interface
-mkdir -p gobgp_interface
+python3 -m pip install --user -r scripts/grpc-build-requirements.txt
+
+! rm -rf "${BUILD_DST}"/*.py
+mkdir -p "${BUILD_DST}"
 pushd gobgp
 
 # must first download at least protobuf packages
@@ -25,7 +27,7 @@ do
 done
 
 echo "Building GRPC interfaces..."
-python3 -m grpc_tools.protoc -I./api -I"$PROTOBUF_BASEDIR"/ptypes --python_out=../gobgp_interface --grpc_python_out=../gobgp_interface api/gobgp.proto api/attribute.proto api/capability.proto
+python3 -m grpc_tools.protoc -I./api -I"$PROTOBUF_BASEDIR"/ptypes --python_out=../"${BUILD_DST}" --grpc_python_out=../"${BUILD_DST}" api/gobgp.proto api/attribute.proto api/capability.proto
 
 git reset --hard
 popd

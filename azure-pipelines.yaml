@@ -1,0 +1,120 @@
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  batch: true
+  branches:
+    include: [ "*" ]
+  paths:
+    exclude: [ "README.md" ]
+
+pr:
+  autoCancel: true
+  branches:
+    include: [ "*" ]
+  paths:
+    exclude: [ "README.md" ]
+
+jobs:
+  - job: docker_ci
+    displayName: "Docker CI"
+    pool:
+      vmImage: "ubuntu-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 10
+
+    steps:
+    - checkout: 'self'
+      clean: true
+      submodules: 'recursive'
+
+    - bash: |
+        docker build --tag jamesits/pilot:latest .
+      displayName: 'Build'
+
+  - job: grpc_interface_build
+    displayName: "Build GRPC interface"
+    pool:
+      vmImage: "ubuntu-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 10
+
+    steps:
+    - checkout: 'self'
+      clean: true
+      submodules: 'recursive'
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.8'
+
+    - bash: |
+        sudo -EH env "PATH=$PATH" scripts/build_grpc.sh
+        cp -r gobgp_interface ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+      displayName: 'Build'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        artifactName: 'gobgp_grpc_interface' 
+        parallel: true
+        parallelCount: 10
+
+  - job: python_ci
+    displayName: "Python CI"
+    pool:
+      vmImage: "ubuntu-latest"
+    workspace:
+      clean: all
+    timeoutInMinutes: 10
+    strategy:
+      matrix:
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+
+    steps:
+    - checkout: 'self'
+      clean: true
+      submodules: 'recursive'
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(python.version)'
+
+    - bash: |
+        sudo -EH env "PATH=$PATH" python3 -m pip install --upgrade pip setuptools mypy flake8 pytest pytest-cov
+      displayName: 'Install dependencies'
+
+    - bash: |
+        sudo -EH env "PATH=$PATH" python3 setup.py install
+      displayName: 'Install package'
+
+    - bash: |
+        mypy --ignore-missing-imports .
+      displayName: 'Mypy check'
+      continueOnError: true
+
+    - script: |
+        flake8 --ignore=E501,F401 .
+      displayName: 'flake8 check'
+      continueOnError: true
+
+    - script: |
+        pytest . --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+      displayName: 'pytest check'
+      continueOnError: true
+
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '**/test-*.xml'
+        testRunTitle: 'Publish test results for Python $(python.version)'
+
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+        reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'

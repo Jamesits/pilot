@@ -1,0 +1,4 @@
+.git/
+config/
+.gitignore
+azure-pipelines.yaml

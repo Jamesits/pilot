@@ -9,7 +9,6 @@ from protobuf_to_dict import protobuf_to_dict
 
 from pilot.gobgp_interface import gobgp_pb2, gobgp_pb2_grpc
 from pilot.gobgp_web.action import string_to_route_target, RedirectAction
-from pilot.gobgp_web.gobgp_dict_unmarshaller import iterate_dict
 from pilot.gobgp_web.nlri import FlowSpecIpPrefix
 from pilot.gobgp_web.path import Path
 
@@ -68,31 +67,31 @@ def get_table():
 def get_routes() -> dict:
     stub = connection_factory()
 
+    ret = []
+
     routes = stub.ListPath(gobgp_pb2.ListPathRequest(
         table_type=gobgp_pb2.GLOBAL,
         # name="",
         family=gobgp_pb2.Family(
-            afi=gobgp_pb2._FAMILY_AFI.values_by_name['AFI_IP'].number,
-            safi=gobgp_pb2._FAMILY_SAFI.values_by_name["SAFI_FLOW_SPEC_UNICAST"].number,
+            afi=gobgp_pb2.Family.AFI_IP,
+            safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
         ),
     ), app.config['GOBGP_TIMEOUT_MS'])
-
-    ret = []
     for route in routes:
-        # for path in route.destination.paths:
-        #     print('best: %s' % path.best)
-        #     print('path_id: %d' % path.identifier)
-        #     print('local path_id: %d' % path.local_identifier)
-        #     print(unmarshal_any(path.nlri))
-        #
-        #     print('--- Path Attributes')
-        #     for attr in path.pattrs:
-        #         print(attr.type_url.split('.')[-1])
-        #         print(unmarshal_any(attr))
+        ret.append(route)
 
-        ret.append(iterate_dict(protobuf_to_dict(route)))
+    routes = stub.ListPath(gobgp_pb2.ListPathRequest(
+        table_type=gobgp_pb2.GLOBAL,
+        # name="",
+        family=gobgp_pb2.Family(
+            afi=gobgp_pb2.Family.AFI_IP6,
+            safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
+        ),
+    ), app.config['GOBGP_TIMEOUT_MS'])
+    for route in routes:
+        ret.append(route)
 
-    return ret
+    return route
 
 
 def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> None:

@@ -7,7 +7,7 @@ from ipaddress import ip_network
 from flask import Blueprint, render_template, request, Response
 
 from pilot.gobgp_web import gobgp_connector
-from pilot.gobgp_web.GoBgpResultEncoder import GoBgpResultEncoder
+from pilot.gobgp_web.gobgp_json_result_encoder import GoBgpResultEncoder
 
 default_encoder = GoBgpResultEncoder(ensure_ascii=False, sort_keys=True, indent=4 * ' ')
 gobgp_web_blueprint = Blueprint('gobgp_web', __name__, template_folder='templates')

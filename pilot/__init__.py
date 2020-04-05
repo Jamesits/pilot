@@ -1,7 +1,6 @@
 import logging
 import os
 import site
-import typing
 
 import toml
 from flask import Flask
@@ -15,7 +14,7 @@ site.addsitedir(os.path.join(
 ))
 
 
-def create_app(config_filename: typing.Optional[str] = None) -> Flask:
+def create_app(config_filename: str) -> Flask:
     config = toml.load(config_filename)
     # process the config
     rule_id = 0

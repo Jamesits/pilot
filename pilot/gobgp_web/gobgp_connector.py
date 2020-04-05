@@ -1,8 +1,8 @@
 # https://blog.balus.xyz/entry/2019/10/18/010000
 import json
 import logging
+import typing
 from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address
-from typing import Union
 
 import grpc
 from flask import current_app as app
@@ -28,11 +28,11 @@ def connection_factory() -> gobgp_pb2_grpc.GobgpApiStub:
     return stub
 
 
-def convert_protobuf_to_dict(i: any) -> dict:
+def convert_protobuf_to_dict(i: typing.Any) -> dict:
     return json.loads(GoBgpResultEncoder().encode(i))
 
 
-def get_afi(ip: Union[IPv4Address, IPv4Network, IPv6Address, IPv6Network]) -> int:
+def get_afi(ip: typing.Union[IPv4Address, IPv4Network, IPv6Address, IPv6Network]) -> int:
     if isinstance(ip, IPv4Network) or isinstance(ip, IPv4Address):
         return gobgp_pb2.Family.AFI_IP
     elif isinstance(ip, IPv6Network) or isinstance(ip, IPv6Address):
@@ -41,7 +41,7 @@ def get_afi(ip: Union[IPv4Address, IPv4Network, IPv6Address, IPv6Network]) -> in
         raise NotImplementedError("Unknown AFI")
 
 
-def get_peers() -> dict:
+def get_peers() -> typing.List:
     stub = connection_factory()
 
     peers = stub.ListPeer(gobgp_pb2.ListPeerRequest(), app.config['GOBGP_TIMEOUT_MS'])
@@ -60,19 +60,19 @@ def get_peers() -> dict:
     return ret
 
 
-def get_table():
-    stub = connection_factory()
-    # table = stub.GetTable(gobgp_pb2.GetTableRequest(
-    #     table_type=gobgp_pb2.GLOBAL,
-    #     family=gobgp_pb2.Family(
-    #         afi =  gobgp_pb2._FAMILY_AFI.values_by_name['AFI_IP'].number,
-    #         safi = gobgp_pb2._FAMILY_SAFI.values_by_name["SAFI_FLOW_SPEC_UNICAST"].number,
-    #     ),
-    #     # name=,
-    # ), gobgp_connection_timeout_ms)
+# def get_table():
+#     stub = connection_factory()
+# table = stub.GetTable(gobgp_pb2.GetTableRequest(
+#     table_type=gobgp_pb2.GLOBAL,
+#     family=gobgp_pb2.Family(
+#         afi =  gobgp_pb2._FAMILY_AFI.values_by_name['AFI_IP'].number,
+#         safi = gobgp_pb2._FAMILY_SAFI.values_by_name["SAFI_FLOW_SPEC_UNICAST"].number,
+#     ),
+#     # name=,
+# ), gobgp_connection_timeout_ms)
 
 
-def get_routes() -> dict:
+def get_routes() -> typing.List[gobgp_pb2.ListPathResponse]:
     stub = connection_factory()
 
     # IPv4
@@ -104,9 +104,9 @@ def get_routes() -> dict:
     return ret4 + ret6
 
 
-def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> None:
+def add_route(source_ip: typing.Union[IPv4Network, IPv6Network], route_target: str) -> None:
     stub = connection_factory()
-    g, l = string_to_route_target(route_target)
+    global_admin, local_admin = string_to_route_target(route_target)
 
     new_path = Path(
         afi=get_afi(source_ip),
@@ -115,7 +115,7 @@ def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> 
             FlowSpecIpPrefix(nlri_type=2, network=source_ip),
         ],
         actions=[
-            RedirectAction(global_admin=g, local_admin=l)
+            RedirectAction(global_admin=global_admin, local_admin=local_admin)
         ]
     )
 
@@ -128,7 +128,7 @@ def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> 
     )
 
 
-def del_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
+def del_route(source_ip: typing.Union[IPv4Network, IPv6Network]) -> None:
     """
     Delete all the routes attached to the source IP
     :param source_ip:

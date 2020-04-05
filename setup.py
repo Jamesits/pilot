@@ -15,7 +15,6 @@ setup(
     name='pilot',
     version='0.0.1',
     description='BGP flowspec based SDN controller at home',
-    license="AGPLv3",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='James Swineson',
@@ -32,5 +31,6 @@ setup(
         'console_scripts': [
             'pilot_server=pilot.__main__:main'
         ]
-    }
+    },
+    python_requires='>=3.7',
 )

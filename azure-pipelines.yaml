@@ -21,7 +21,7 @@ jobs:
       vmImage: "ubuntu-latest"
     workspace:
       clean: all
-    timeoutInMinutes: 30
+    timeoutInMinutes: 30  # grpcio-tools build takes a long time
 
     steps:
     - checkout: 'self'
@@ -85,7 +85,7 @@ jobs:
         versionSpec: '$(python.version)'
 
     - bash: |
-        sudo -EH env "PATH=$PATH" python3 -m pip install --upgrade pip setuptools mypy flake8 pytest pytest-cov
+        sudo -EH env "PATH=$PATH" python3 -m pip install --upgrade pip setuptools wheel mypy flake8 pytest pytest-cov
       displayName: 'Install dependencies'
 
     - bash: |
@@ -93,12 +93,24 @@ jobs:
       displayName: 'Install package'
 
     - bash: |
+        sudo -EH env "PATH=$PATH" python3 setup.py sdist bdist_wheel
+        cp -r dist/* ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+      displayName: 'Generate wheel package'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'wheel-$(python.version)'
+        parallel: true
+        parallelCount: 10
+
+    - bash: |
         mypy --ignore-missing-imports .
       displayName: 'Mypy check'
       continueOnError: true
 
     - script: |
-        flake8 --ignore=E501,F401 --exclude=".git,__pycache__,docs/source/conf.py,old,build,dist,gobgp,pilot/gobgp_interface" .
+        flake8 --ignore=E501,F401,W503 --exclude=".git,__pycache__,docs/source/conf.py,old,build,dist,gobgp,pilot/gobgp_interface" .
       displayName: 'flake8 check'
       continueOnError: true
 

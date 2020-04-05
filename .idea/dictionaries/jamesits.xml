@@ -6,6 +6,7 @@
       <w>flowspec</w>
       <w>gobgp</w>
       <w>grpc</w>
+      <w>grpcio</w>
       <w>levelname</w>
       <w>localappdata</w>
       <w>nlri</w>

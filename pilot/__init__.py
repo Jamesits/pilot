@@ -1,8 +1,12 @@
+import logging
 import os
 import site
 import typing
 
+import toml
 from flask import Flask
+
+logger = logging.getLogger(__name__)
 
 # for automatic generated GRPC stubs to work
 site.addsitedir(os.path.join(
@@ -12,8 +16,20 @@ site.addsitedir(os.path.join(
 
 
 def create_app(config_filename: typing.Optional[str] = None) -> Flask:
+    config = toml.load(config_filename)
+    # process the config
+    rule_id = 0
+    if 'rule' in config:
+        for rule in config['rule']:
+            rule['id'] = rule_id
+            rule_id += 1
+    else:
+        logger.warning(f"You have no rules defined")
+        config['rule'] = []
+
     app = Flask(__name__, instance_relative_config=False)
-    app.config.from_pyfile(config_filename)
+    # app.config.from_pyfile(config_filename)
+    app.config.update(config)  # from_object or from_mapping doesn't work here
     initialize_extensions(app)
     register_blueprints(app)
     return app

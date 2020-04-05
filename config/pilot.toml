@@ -1,0 +1,23 @@
+# Where you want the HTTP API and Web UI to listen on
+[http_server]
+listen_ip = ''
+listen_port = 8080
+
+# Your GoBGP instance
+[gobgp]
+address = '192.168.1.1'
+port = '50051'
+timeout_ms = 1000
+
+# Rules; only route_targe is supported by now
+[[rule]]
+display_name = "China Telecom"
+route_target = "100:100"
+
+[[rule]]
+display_name = "China Mobile"
+route_target = "200:200"
+
+[[rule]]
+display_name = "VPN to HK"
+route_target = "300:300"

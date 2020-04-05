@@ -8,30 +8,22 @@
     font-weight: normal;
 }
 
-.rule-list dl {
-    margin-block-start: 0;
-    margin-block-end: 0;
-    margin-inline-start: 0;
-    margin-inline-end: 0;
+.rule-list table {
+    width: 100%;
+    border-collapse: collapse;
+    display: contents;
 }
 
-.rule-list dt {
-    display: inline-block;
-    min-width: 48ch;
-    margin: 0;
+.rule-list tbody {
+    display: contents;
 }
 
-.rule-list dd {
-    display: inline;
-    margin: 0;
+.rule-list tr {
+    display: grid;
+    grid-template-columns: 48ch 4ch 1fr;
 }
 
-.rule-list dd::before {
-    content: "=>";
-    display: inline;
-}
-
-.rule-list dd::after {
-    content: "\A";
-    display: block;
+.rule-list tr:hover {
+    background: #333;
+    color: white;
 }

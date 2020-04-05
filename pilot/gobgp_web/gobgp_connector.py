@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 
 
 def connection_factory() -> gobgp_pb2_grpc.GobgpApiStub:
-    channel = grpc.insecure_channel(f"{app.config['GOBGP_IP']}:{app.config['GOBGP_PORT']}")
+    gobgp_ip = app.config['gobgp']['address']
+    gobgp_port = app.config['gobgp']['port']
+    channel = grpc.insecure_channel(f"{gobgp_ip}:{gobgp_port}")
     stub = gobgp_pb2_grpc.GobgpApiStub(channel)
     return stub
 
@@ -67,14 +69,14 @@ def get_table():
     #         safi = gobgp_pb2._FAMILY_SAFI.values_by_name["SAFI_FLOW_SPEC_UNICAST"].number,
     #     ),
     #     # name=,
-    # ), app.config['GOBGP_TIMEOUT_MS'])
+    # ), gobgp_connection_timeout_ms)
 
 
 def get_routes() -> dict:
     stub = connection_factory()
 
-    ret = []
-
+    # IPv4
+    ret4 = []
     routes = stub.ListPath(gobgp_pb2.ListPathRequest(
         table_type=gobgp_pb2.GLOBAL,
         # name="",
@@ -82,10 +84,12 @@ def get_routes() -> dict:
             afi=gobgp_pb2.Family.AFI_IP,
             safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
         ),
-    ), app.config['GOBGP_TIMEOUT_MS'])
+    ), app.config['gobgp']['timeout_ms'])
     for route in routes:
-        ret.append(route)
+        ret4.append(route)
 
+    # IPv6
+    ret6 = []
     routes = stub.ListPath(gobgp_pb2.ListPathRequest(
         table_type=gobgp_pb2.GLOBAL,
         # name="",
@@ -93,11 +97,11 @@ def get_routes() -> dict:
             afi=gobgp_pb2.Family.AFI_IP6,
             safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
         ),
-    ), app.config['GOBGP_TIMEOUT_MS'])
+    ), app.config['gobgp']['timeout_ms'])
     for route in routes:
-        ret.append(route)
+        ret6.append(route)
 
-    return ret
+    return ret4 + ret6
 
 
 def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> None:
@@ -120,7 +124,7 @@ def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> 
             table_type=gobgp_pb2.GLOBAL,
             path=new_path.packed(),
         ),
-        timeout=app.config['GOBGP_TIMEOUT_MS'],
+        timeout=app.config['gobgp']['timeout_ms'],
     )
 
 
@@ -145,5 +149,5 @@ def del_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
             table_type=gobgp_pb2.GLOBAL,
             path=new_path.packed(),
         ),
-        timeout=app.config['GOBGP_TIMEOUT_MS'],
+        timeout=app.config['gobgp']['timeout_ms'],
     )

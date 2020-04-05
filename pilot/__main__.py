@@ -17,20 +17,21 @@ logging.basicConfig(
 )
 
 args = parse_args()
+default_config_name = "pilot.toml"
 
 user_config_file_path: str = args.config
 if len(user_config_file_path) == 0:
     user_config_file_path = find_first_existing_file([
         # *nix
-        "/etc/pilot/pilot.conf",
+        os.path.join("/", "etc", "pilot", default_config_name),
         # Windows
-        os.path.join(os.environ.get('LOCALAPPDATA', ''), "pilot", "pilot.conf"),
-        os.path.join(os.environ.get('APPDATA', ''), "pilot", "pilot.conf"),
-        os.path.join(os.environ.get('PROGRAMDATA', ''), "pilot", "pilot.conf"),
+        os.path.join(os.environ.get('LOCALAPPDATA', ''), "pilot", default_config_name),
+        os.path.join(os.environ.get('APPDATA', ''), "pilot", default_config_name),
+        os.path.join(os.environ.get('PROGRAMDATA', ''), "pilot", default_config_name),
         # current dir
-        os.path.join(os.getcwd(), "pilot.conf"),
+        os.path.join(os.getcwd(), default_config_name),
         # config file located at the root of project directory
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "pilot.conf"),
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", default_config_name),
     ])
 if len(user_config_file_path) == 0:
     logger.error("Unable to find a config file, please manually set --config command line argument")
@@ -53,8 +54,8 @@ def __after_request_hook(response):
 
 def main() -> None:
     """Self-contained HTTP server"""
-    ip: str = app.config['HTTP_SERVER_LISTEN_IP']
-    port: int = int(app.config['HTTP_SERVER_LISTEN_PORT'])
+    ip: str = app.config['http_server']['listen_ip']
+    port: int = int(app.config['http_server']['listen_port'])
     logger.info(f"Pilot built-in HTTP server started at {ip}:{port}")
     http_server = WSGIServer((ip, port), app)
     http_server.serve_forever()

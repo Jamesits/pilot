@@ -4,34 +4,36 @@
 
 {% block content %}
     <div class="mt-3 mb-3">
-        <button type="button" class="btn btn-outline-dark">Read Status</button>
+        <button type="button" class="btn btn-outline-dark" onClick="window.location.reload();">Read Status</button>
     </div>
     <div class="mt-3 mb-3">
-        <button type="button" class="btn btn-outline-dark">China Telecom</button>
-        <button type="button" class="btn btn-outline-dark">China Unicom</button>
-        <button type="button" class="btn btn-outline-dark">VPN to HK</button>
-        <button type="button" class="btn btn-outline-dark">Clear Settings</button>
+        {% for rule in rules %}
+            <button type="button" class="btn btn-outline-dark"
+                    onclick="flow_self_apply({{ rule['id'] }});">{{ rule['display_name'] }}</button>
+        {% endfor %}
+        <button type="button" class="btn btn-outline-dark" onclick="flow_self_delete();">Clear Settings</button>
     </div>
     <div class="rule-list mt-3 mb-3 pt-1 pb-1 pl-2 pr-2 border border-dark rounded bg-light">
         <p>
             <span class="tab-stop-small font-weight-bold">IP address: </span>{{ ip }}<br>
-            <span class="tab-stop-small font-weight-bold">Network: </span>???
+            <span class="tab-stop-small font-weight-bold">Network: </span>{{ current_rule }}
         </p>
         <p>===============================</p>
-        <dl>
-            {% for route in routes %}
-                <dt>{{ route['destination']['prefix'] }}</dt>
-                <dd>
-                    {% for path in route['destination']['paths'] %}
-                        {% for pattr in path['pattrs'] %}
-                            {% for community in pattr['communities'] %}
-                                {{ community['string'] }}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endfor %}
-                </dd>
+        <table>
+            <tbody>
+            {% for route in cooked_routes %}
+                <tr>
+                    <td title="{{ route['display_selector'] }}">{{ route['network'] }}</td>
+                    <td> =></td>
+                    {% if 'rule_display_name' in route %}
+                        <td title="Community: {{ route['community'] }}">{{ route['rule_display_name'] }}</td>
+                    {% else %}
+                        <td>{{ route['community'] }}</td>
+                    {% endif %}
+                </tr>
             {% endfor %}
-        </dl>
+            </tbody>
+        </table>
     </div>
 
 {% endblock %}

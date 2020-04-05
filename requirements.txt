@@ -3,3 +3,4 @@ grpcio
 protobuf
 flask
 protobuf3-to-dict
+toml

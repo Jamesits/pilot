@@ -21,3 +21,7 @@ function flow_self_apply(rule_id) {
         window.location.reload();
     });
 }
+
+$(function () {
+    $('.fill-current-year').text(new Date().getFullYear());
+});

@@ -1,6 +1,6 @@
 # Pilot
 
-Simple web-based network controller for SDN at home. 
+Simple web-based SDN network controller for family and friends.
 
 [![Build Status](https://dev.azure.com/nekomimiswitch/General/_apis/build/status/pilot?branchName=master)](https://dev.azure.com/nekomimiswitch/General/_build/latest?definitionId=81&branchName=master)
 
@@ -14,11 +14,11 @@ Pilot acts as a frontend for GoBGP, which allows any device in your LAN to open 
 
 Server running Pilot:
 * Python 3.7 or later
-* LAN devices do not need SNAT/masquerade to access the server
+* LAN devices should not go through SNAT/masquerade to access the server
 
 Router (network gateway):
 * Has VRF-Lite capability
-* Supports [BGP flowspec](https://tools.ietf.org/html/rfc5575)
+* Supports [BGP Flow Specification](https://tools.ietf.org/html/rfc5575)
 
 ## Usage
 
@@ -56,7 +56,7 @@ Details see [GoBGP documentation](https://github.com/osrg/gobgp/blob/master/docs
 
 ### Pilot Setup
 
-Just spin up the program:
+Create a config file ([example](config/pilot.toml)), then spin up the program:
 
 ```shell script
 python3 -m pilot --config path/to/pilot.toml
@@ -65,3 +65,4 @@ python3 -m pilot --config path/to/pilot.toml
 ## Thanks
 
 This project is inspired by [xtomcom/NetworkSwitch](https://github.com/xtomcom/NetworkSwitch).
+

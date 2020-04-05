@@ -1,6 +1,6 @@
 # https://blog.balus.xyz/entry/2019/10/18/010000
 import logging
-from ipaddress import IPv4Network, IPv6Network
+from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address
 from typing import Union
 
 import grpc
@@ -8,7 +8,7 @@ from flask import current_app as app
 from protobuf_to_dict import protobuf_to_dict
 
 from pilot.gobgp_interface import gobgp_pb2, gobgp_pb2_grpc
-from pilot.gobgp_web.action import RateLimitAction
+from pilot.gobgp_web.action import string_to_route_target, RedirectAction
 from pilot.gobgp_web.gobgp_dict_unmarshaller import iterate_dict
 from pilot.gobgp_web.nlri import FlowSpecIpPrefix
 from pilot.gobgp_web.path import Path
@@ -25,10 +25,10 @@ def connection_factory() -> gobgp_pb2_grpc.GobgpApiStub:
     return stub
 
 
-def get_afi(ip: Union[IPv4Network, IPv6Network]) -> int:
-    if isinstance(ip, IPv4Network):
+def get_afi(ip: Union[IPv4Address, IPv4Network, IPv6Address, IPv6Network]) -> int:
+    if isinstance(ip, IPv4Network) or isinstance(ip, IPv4Address):
         return gobgp_pb2.Family.AFI_IP
-    elif isinstance(ip, IPv6Network):
+    elif isinstance(ip, IPv6Network) or isinstance(ip, IPv6Address):
         return gobgp_pb2.Family.AFI_IPV6
     else:
         raise NotImplementedError("Unknown AFI")
@@ -95,8 +95,9 @@ def get_routes() -> dict:
     return ret
 
 
-def add_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
+def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> None:
     stub = connection_factory()
+    g, l = string_to_route_target(route_target)
 
     new_path = Path(
         afi=get_afi(source_ip),
@@ -105,7 +106,7 @@ def add_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
             FlowSpecIpPrefix(nlri_type=2, network=source_ip),
         ],
         actions=[
-            RateLimitAction(rate=0)
+            RedirectAction(global_admin=g, local_admin=l)
         ]
     )
 

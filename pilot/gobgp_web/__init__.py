@@ -2,6 +2,8 @@
 The recipes Blueprint handles the creation, modification, deletion,
 and viewing of recipes for this application.
 """
+from ipaddress import ip_network
+
 from flask import Blueprint, render_template, request, Response
 
 from pilot.gobgp_web import gobgp_connector
@@ -41,11 +43,11 @@ def flow():
 
 @gobgp_web_blueprint.route('/add')
 def add_path():
-    gobgp_connector.add_route()
+    gobgp_connector.add_route(source_ip=ip_network("10.0.0.1"), route_target="100:100")
     return ""
 
 
 @gobgp_web_blueprint.route('/del')
 def del_path():
-    gobgp_connector.del_route()
+    gobgp_connector.del_route(source_ip=ip_network("10.0.0.1"))
     return ""

@@ -30,12 +30,22 @@ def addpath():
 @gobgp_web_blueprint.route('/peer')
 def peer():
     ret = gobgp_connector.get_peers()
-    # import ipdb; ipdb.set_trace()
     return Response(default_encoder.encode(ret), mimetype='application/json')
 
 
 @gobgp_web_blueprint.route('/flow')
 def flow():
-    return Response(default_encoder.encode({
-        "fuck": "shit"
-    }), mimetype='application/json')
+    ret = gobgp_connector.get_routes()
+    return Response(default_encoder.encode(ret), mimetype='application/json')
+
+
+@gobgp_web_blueprint.route('/add')
+def add_path():
+    gobgp_connector.add_route()
+    return ""
+
+
+@gobgp_web_blueprint.route('/del')
+def del_path():
+    gobgp_connector.del_route()
+    return ""

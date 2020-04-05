@@ -1,32 +1,60 @@
+# https://blog.balus.xyz/entry/2019/10/18/010000
+import logging
+from ipaddress import IPv4Network, IPv6Network
+from typing import Union
+
 import grpc
 from flask import current_app as app
 from protobuf_to_dict import protobuf_to_dict
 
-from pilot.gobgp_interface import gobgp_pb2
-from pilot.gobgp_interface import gobgp_pb2_grpc
+from pilot.gobgp_interface import gobgp_pb2, gobgp_pb2_grpc
+from pilot.gobgp_web.action import RateLimitAction
+from pilot.gobgp_web.gobgp_dict_unmarshaller import iterate_dict
+from pilot.gobgp_web.nlri import FlowSpecIpPrefix
+from pilot.gobgp_web.path import Path
+
+# We can use MessageToDict but it'll throw exception for Any
+# from google.protobuf.json_format import MessageToDict
+
+logger = logging.getLogger(__name__)
 
 
-def get_peers():
+def connection_factory() -> gobgp_pb2_grpc.GobgpApiStub:
     channel = grpc.insecure_channel(f"{app.config['GOBGP_IP']}:{app.config['GOBGP_PORT']}")
     stub = gobgp_pb2_grpc.GobgpApiStub(channel)
+    return stub
+
+
+def get_afi(ip: Union[IPv4Network, IPv6Network]) -> int:
+    if isinstance(ip, IPv4Network):
+        return gobgp_pb2.Family.AFI_IP
+    elif isinstance(ip, IPv6Network):
+        return gobgp_pb2.Family.AFI_IPV6
+    else:
+        raise NotImplementedError("Unknown AFI")
+
+
+def get_peers() -> dict:
+    stub = connection_factory()
 
     peers = stub.ListPeer(gobgp_pb2.ListPeerRequest(), app.config['GOBGP_TIMEOUT_MS'])
     ret = []
 
     for peer in peers:
         peer = peer.peer
-        print("BGP neighbor is %s, remote AS %d" % (peer.conf.neighbor_address, peer.conf.peer_as))
-        print("  BGP version 4, remote router ID %s" % (peer.state.router_id))
-        print("  BGP state = %s, up for %s" % (peer.state.session_state, peer.timers.state.uptime))
-
+        logger.info(
+            f"neighbor_ip={peer.conf.neighbor_address}, remote_as={peer.conf.peer_as}, "
+            f"remote_id={peer.state.router_id}, session_state={peer.state.session_state}, "
+            # uptime is a Timestamp https://googleapis.dev/python/protobuf/latest/google/protobuf/timestamp_pb2.html
+            f"uptime={str(peer.timers.state.uptime.ToSeconds())}s"
+        )
         ret.append(protobuf_to_dict(peer))
 
     return ret
 
 
 def get_table():
-    channel = grpc.insecure_channel(f"{app.config['GOBGP_IP']}:{app.config['GOBGP_PORT']}")
-    stub = gobgp_pb2_grpc.GobgpApiStub(channel)
+    stub = connection_factory()
     # table = stub.GetTable(gobgp_pb2.GetTableRequest(
     #     table_type=gobgp_pb2.GLOBAL,
     #     family=gobgp_pb2.Family(
@@ -37,9 +65,8 @@ def get_table():
     # ), app.config['GOBGP_TIMEOUT_MS'])
 
 
-def get_routes():
-    channel = grpc.insecure_channel(f"{app.config['GOBGP_IP']}:{app.config['GOBGP_PORT']}")
-    stub = gobgp_pb2_grpc.GobgpApiStub(channel)
+def get_routes() -> dict:
+    stub = connection_factory()
 
     routes = stub.ListPath(gobgp_pb2.ListPathRequest(
         table_type=gobgp_pb2.GLOBAL,
@@ -52,6 +79,65 @@ def get_routes():
 
     ret = []
     for route in routes:
-        ret.append(protobuf_to_dict(route))
+        # for path in route.destination.paths:
+        #     print('best: %s' % path.best)
+        #     print('path_id: %d' % path.identifier)
+        #     print('local path_id: %d' % path.local_identifier)
+        #     print(unmarshal_any(path.nlri))
+        #
+        #     print('--- Path Attributes')
+        #     for attr in path.pattrs:
+        #         print(attr.type_url.split('.')[-1])
+        #         print(unmarshal_any(attr))
+
+        ret.append(iterate_dict(protobuf_to_dict(route)))
 
     return ret
+
+
+def add_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
+    stub = connection_factory()
+
+    new_path = Path(
+        afi=get_afi(source_ip),
+        safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
+        nlris=[
+            FlowSpecIpPrefix(nlri_type=2, network=source_ip),
+        ],
+        actions=[
+            RateLimitAction(rate=0)
+        ]
+    )
+
+    stub.AddPath(
+        gobgp_pb2.AddPathRequest(
+            table_type=gobgp_pb2.GLOBAL,
+            path=new_path.packed(),
+        ),
+        timeout=app.config['GOBGP_TIMEOUT_MS'],
+    )
+
+
+def del_route(source_ip: Union[IPv4Network, IPv6Network]) -> None:
+    """
+    Delete all the routes attached to the source IP
+    :param source_ip:
+    :return:
+    """
+    stub = connection_factory()
+
+    new_path = Path(
+        afi=get_afi(source_ip),
+        safi=gobgp_pb2.Family.SAFI_FLOW_SPEC_UNICAST,
+        nlris=[
+            FlowSpecIpPrefix(nlri_type=2, network=source_ip),
+        ],
+    )
+
+    stub.DeletePath(
+        gobgp_pb2.DeletePathRequest(
+            table_type=gobgp_pb2.GLOBAL,
+            path=new_path.packed(),
+        ),
+        timeout=app.config['GOBGP_TIMEOUT_MS'],
+    )

@@ -6,7 +6,7 @@ from ipaddress import ip_address
 from json import JSONEncoder
 
 from google.protobuf.any_pb2 import Any
-from google.protobuf.pyext._message import RepeatedCompositeContainer
+from google.protobuf.pyext._message import RepeatedCompositeContainer, RepeatedScalarContainer
 
 from pilot.gobgp_interface import gobgp_pb2, attribute_pb2, capability_pb2
 
@@ -113,7 +113,7 @@ class GoBgpResultEncoder(JSONEncoder):
         if isinstance(o, Any):
             return unmarshal_any(o)
 
-        if isinstance(o, RepeatedCompositeContainer):  # this is an iterable
+        if isinstance(o, (RepeatedCompositeContainer, RepeatedScalarContainer)):  # this is an iterable
             ret = []
             for item in o:
                 ret.append(item)

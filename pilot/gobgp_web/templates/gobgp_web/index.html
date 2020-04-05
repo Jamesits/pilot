@@ -1,15 +1,37 @@
 {% extends "base.html" %}
 
-{% set title = 'Homepage' %}
+{% set title = 'Overview' %}
 
 {% block content %}
-    <br>
-    <br>
-    <br>
-    <p>Your IP address: {{ ip }}</p>
-    <div><pre>
-        {% for route in routes %}
-            {{route.destination.prefix}}
-        {% endfor %}
-    </pre></div>
+    <div class="mt-3 mb-3">
+        <button type="button" class="btn btn-outline-dark">Read Status</button>
+    </div>
+    <div class="mt-3 mb-3">
+        <button type="button" class="btn btn-outline-dark">China Telecom</button>
+        <button type="button" class="btn btn-outline-dark">China Unicom</button>
+        <button type="button" class="btn btn-outline-dark">VPN to HK</button>
+        <button type="button" class="btn btn-outline-dark">Clear Settings</button>
+    </div>
+    <div class="rule-list mt-3 mb-3 pt-1 pb-1 pl-2 pr-2 border border-dark rounded bg-light">
+        <p>
+            <span class="tab-stop-small font-weight-bold">IP address: </span>{{ ip }}<br>
+            <span class="tab-stop-small font-weight-bold">Network: </span>???
+        </p>
+        <p>===============================</p>
+        <dl>
+            {% for route in routes %}
+                <dt>{{ route['destination']['prefix'] }}</dt>
+                <dd>
+                    {% for path in route['destination']['paths'] %}
+                        {% for pattr in path['pattrs'] %}
+                            {% for community in pattr['communities'] %}
+                                {{ community['string'] }}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </dd>
+            {% endfor %}
+        </dl>
+    </div>
+
 {% endblock %}

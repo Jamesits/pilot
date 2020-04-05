@@ -1,4 +1,5 @@
 # https://blog.balus.xyz/entry/2019/10/18/010000
+import json
 import logging
 from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address
 from typing import Union
@@ -9,6 +10,7 @@ from protobuf_to_dict import protobuf_to_dict
 
 from pilot.gobgp_interface import gobgp_pb2, gobgp_pb2_grpc
 from pilot.gobgp_web.action import string_to_route_target, RedirectAction
+from pilot.gobgp_web.gobgp_json_result_encoder import GoBgpResultEncoder
 from pilot.gobgp_web.nlri import FlowSpecIpPrefix
 from pilot.gobgp_web.path import Path
 
@@ -22,6 +24,10 @@ def connection_factory() -> gobgp_pb2_grpc.GobgpApiStub:
     channel = grpc.insecure_channel(f"{app.config['GOBGP_IP']}:{app.config['GOBGP_PORT']}")
     stub = gobgp_pb2_grpc.GobgpApiStub(channel)
     return stub
+
+
+def convert_protobuf_to_dict(i: any) -> dict:
+    return json.loads(GoBgpResultEncoder().encode(i))
 
 
 def get_afi(ip: Union[IPv4Address, IPv4Network, IPv6Address, IPv6Network]) -> int:
@@ -91,7 +97,7 @@ def get_routes() -> dict:
     for route in routes:
         ret.append(route)
 
-    return route
+    return ret
 
 
 def add_route(source_ip: Union[IPv4Network, IPv6Network], route_target: str) -> None:

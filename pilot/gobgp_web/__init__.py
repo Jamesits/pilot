@@ -16,11 +16,11 @@ gobgp_web_blueprint = Blueprint('gobgp_web', __name__, template_folder='template
 @gobgp_web_blueprint.route('/')
 def index():
     routes = gobgp_connector.get_routes()
-    print(routes)
-    return render_template('gobgp_web/index.html', **{
-        "ip": request.remote_addr,
-        "routes": routes,
-    })
+    return render_template(
+        'gobgp_web/index.html',
+        ip=request.remote_addr,
+        routes=gobgp_connector.convert_protobuf_to_dict(routes),
+    )
 
 
 @gobgp_web_blueprint.route('/add_path')

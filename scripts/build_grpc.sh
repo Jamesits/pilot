@@ -12,8 +12,8 @@ mkdir -p "${BUILD_DST}"
 pushd gobgp
 
 # must first download at least protobuf packages
-export GO111MODULE=on
-go get -d ./...
+export GO111MODULE=off
+go get -u ./...
 PROTOBUF_BASEDIR="$(go list -f '{{ .Dir }}' -m github.com/golang/protobuf)"
 
 git reset --hard

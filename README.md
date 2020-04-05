@@ -18,7 +18,7 @@ Server running Pilot:
 
 Router (network gateway):
 * Has VRF-Lite capability
-* Supports [BGP Flow Specification](https://tools.ietf.org/html/rfc5575)
+* Supports [BGP Flow Specification](https://tools.ietf.org/html/rfc5575) client
 
 ## Usage
 

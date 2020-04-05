@@ -1,11 +1,14 @@
 FROM golang:1-buster as grpc_interface_builder
+ENV GOPATH=/root/go
 
 RUN apt-get update -y \
     && apt-get install -y python3 python3-pip python3-setuptools
+RUN pip3 install --upgrade grpcio-tools
 
 COPY . /pilot
 WORKDIR /pilot
-RUN ./scripts/build_grpc.sh
+RUN mkdir -p "$GOPATH" \
+    && ./scripts/build_grpc.sh
 
 FROM python:3-buster
 LABEL maintainer="docker@public.swineson.me"

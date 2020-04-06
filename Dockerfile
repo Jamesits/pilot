@@ -37,6 +37,7 @@ COPY --from=grpc_interface_builder /pilot/pilot/gobgp_interface /tmp/pilot/pilot
 
 RUN cd /tmp/pilot \
     && python3 setup.py install \
+    && rm -rf /tmp/pilot \
     && setcap CAP_NET_BIND_SERVICE=+eip $(realpath $(which python))
 
 COPY supervisor /etc/supervisor/

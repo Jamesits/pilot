@@ -30,7 +30,7 @@ Gateway router:
 
 Example configuration for Cisco IOS XE 16.x:
 ```
-! enable flowspec rule installation
+! Enable flowspec rule installation
 flowspec
  local-install interface-all
 
@@ -48,11 +48,13 @@ interface GigabitEthernet0/0/0
  ip vrf select source
  ip vrf receive UPLINK1
  ip flowspec disable
+ ipv6 flowspec disable
 interface GigabitEthernet0/0/1
  description uplink-2
  ip vrf select source
  ip vrf receive UPLINK2
  ip flowspec disable
+ ipv6 flowspec disable
 
 ! LAN interfaces
 interface GigabitEthernet0/0/2

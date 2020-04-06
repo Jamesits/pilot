@@ -46,6 +46,8 @@ RUN cd /tmp/pilot \
 COPY supervisor /etc/supervisor/
 COPY config /etc/pilot/
 
+ENV GOBGP_API_LISTEN="127.0.0.1:50051"
+
 EXPOSE 80/tcp
 CMD [ "supervisord", "-c", "/etc/supervisor/supervisor.conf", "-n" ]
 

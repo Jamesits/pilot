@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 from google.protobuf.any_pb2 import Any
@@ -15,7 +15,7 @@ class Path:
     origin: int = 0
     actions: Optional[List[Action]] = None
     next_hops: Optional[List[str]] = None
-    nlris: List[NetworkLayerReachabilityInformation] = None
+    nlris: List[NetworkLayerReachabilityInformation] = field(default_factory=list)
     additional_pattrs: Optional[List[Any]] = None  # contains a OriginAttribute, an Action and a MpReachNLRIAttribute
 
     def next_hop_not_important(self: 'Path'):
@@ -49,7 +49,7 @@ class Path:
         nh_attribute = Any()
         nh_attribute.Pack(attribute_pb2.MpReachNLRIAttribute(
             family=self.get_family(),
-            nlris=[pack_nlris(*self.nlris)],
+            nlris=[pack_nlris(*self.nlris), ],
             next_hops=nh,
         ))
         pattrs.append(nh_attribute)

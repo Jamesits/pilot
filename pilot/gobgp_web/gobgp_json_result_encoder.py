@@ -7,6 +7,7 @@ from json import JSONEncoder
 
 from google.protobuf.any_pb2 import Any
 from google.protobuf.pyext._message import RepeatedCompositeContainer, RepeatedScalarContainer
+from google.protobuf.reflection import GeneratedProtocolMessageType
 
 from pilot.gobgp_interface import gobgp_pb2, attribute_pb2, capability_pb2
 
@@ -41,7 +42,7 @@ def unmarshal_any(any_msg):
     return msg
 
 
-def resolve_protobuf_any_dict(i: dict) -> typing.Any:
+def resolve_protobuf_any_dict(i: typing.Mapping[str, typing.Any]) -> typing.Any:
     print(i['type_url'])
     return i
 
@@ -63,7 +64,7 @@ def iterate_dict(i: typing.Any) -> typing.Any:
     return i
 
 
-def protobuf_obj_to_dict(o: any) -> dict:
+def protobuf_obj_to_dict(o: GeneratedProtocolMessageType) -> dict:
     assert hasattr(o, 'DESCRIPTOR')
 
     ret = {
@@ -90,9 +91,9 @@ def protobuf_obj_to_dict(o: any) -> dict:
     return ret
 
 
-def community_to_dict(i: any) -> dict:
+def community_to_dict(i: typing.Any) -> dict:
     ret = protobuf_obj_to_dict(i)
-    ret['local_admin']: i.local_admin
+    ret['local_admin'] = i.local_admin
     if hasattr(i, 'as'):
         ret['global_admin'] = str(getattr(i, 'as'))
         ret['asn'] = getattr(i, 'as')

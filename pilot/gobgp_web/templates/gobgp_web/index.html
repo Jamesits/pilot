@@ -3,7 +3,7 @@
 {% set title = 'Overview' %}
 
 {% block content %}
-    <div class="mt-3 mb-3">
+    <div class="mb-3">
         <button type="button" class="btn btn-outline-dark" onClick="window.location.reload();">Read Status</button>
     </div>
     <div class="mt-3 mb-3">
@@ -11,7 +11,8 @@
             <button type="button" class="btn btn-outline-dark"
                     onclick="flow_self_apply({{ rule['id'] }});">{{ rule['display_name'] }}</button>
         {% endfor %}
-        <button type="button" class="btn btn-outline-dark" onclick="flow_self_delete();">Clear Settings</button>
+        <button type="button" class="btn btn-outline-dark mt-2 mb-2" onclick="flow_self_delete();">Clear Settings
+        </button>
     </div>
     <div class="rule-list mt-3 mb-3 pt-1 pb-1 pl-2 pr-2 border border-dark rounded bg-light">
         <p>

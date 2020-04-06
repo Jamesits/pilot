@@ -49,6 +49,7 @@ def __placeholder():
 @app.after_request
 def __after_request_hook(response):
     response.headers["Server"] = "Microsoft-IIS/7.0"
+    response.headers["Cache-Control"] = "no-store"  # Mobile Safari 13 do not have easy methods to invalidate the cache
     return response
 
 

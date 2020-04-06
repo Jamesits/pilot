@@ -3,6 +3,10 @@
     display: inline-block;
 }
 
+.rule-list {
+    overflow-x: auto;
+}
+
 .rule-list * {
     font-family: monospace;
     font-weight: normal;
@@ -20,10 +24,14 @@
 
 .rule-list tr {
     display: grid;
-    grid-template-columns: 48ch 4ch 1fr;
+    grid-template-columns: 32ch 4ch 1fr;
 }
 
 .rule-list tr:hover {
     background: #333;
     color: white;
+}
+
+.rule-list td {
+    white-space: nowrap;
 }

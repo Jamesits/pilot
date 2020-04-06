@@ -1,6 +1,6 @@
-global-include templates/*
-global-include **/templates/*
 graft pilot/static
+graft pilot/templates
+graft pilot/gobgp_web/templates
 exclude .travis.yml
 exclude appveyor.yml
 exclude azure-pipelines.yaml

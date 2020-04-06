@@ -6,9 +6,9 @@ Simple web-based SDN controller for family and friends.
 
 ## Introduction
 
-Pilot acts as a frontend for GoBGP, which allows any device in your LAN to open a web page and select their own network profile based on pre-defined route targets.
+Pilot is a frontend of GoBGP. Any device in your LAN can visit Pilot's web interface to easily select their own VRF.
 
-![](assets/pilot-webui.png)
+![Pilot web interface screenshot](assets/pilot-webui.png)
 
 ## Requirements
 
@@ -16,17 +16,69 @@ Server running Pilot:
 * Python 3.7 or later
 * LAN devices should not go through SNAT/masquerade to access the server
 
-Router (network gateway):
+Gateway router:
 * Has VRF-Lite capability
-* Supports [BGP Flow Specification](https://tools.ietf.org/html/rfc5575) client
+* Can act as a [BGP Flow Specification](https://tools.ietf.org/html/rfc5575) client
 
 ## Usage
 
 ### Router Setup
 
-* Put different network profiles are put in different VRFs
+* Put different network profiles in different VRFs
 * Add BGP session with your GoBGP instance and enable `ipv4 flowspec` and `ipv6 flowspec` address families
 * Allow flowspec rule installation on the interfaces to LAN clients
+
+Example configuration for Cisco IOS XE 16.x:
+```
+! enable flowspec rule installation
+flowspec
+ local-install interface-all
+
+! VRF definition
+ip vrf UPLINK1
+ rd 100:100
+ route-target both 100:100
+ip vrf UPLINK2
+ rd 200:200
+ route-target both 200:200
+
+! Uplink interfaces
+interface GigabitEthernet0/0/0
+ description uplink-1
+ ip vrf select source
+ ip vrf receive UPLINK1
+ ip flowspec disable
+interface GigabitEthernet0/0/1
+ description uplink-2
+ ip vrf select source
+ ip vrf receive UPLINK2
+ ip flowspec disable
+
+! LAN interfaces
+interface GigabitEthernet0/0/2
+ description LAN
+ ip address 192.168.1.1 255.255.255.0
+ ip vrf select source
+ ip vrf receive UPLINK1
+ ip vrf receive UPLINK2
+
+! BGP peer setup
+router bgp 65540
+ bgp router-id 169.254.1.2
+ neighbor 169.254.1.1 remote-as 65540
+ address-family ipv4 flowspec
+  neighbor 169.254.1.1 activate
+  neighbor 169.254.1.1 soft-reconfiguration inbound
+ address-family ipv6 flowspec
+  neighbor 169.254.1.1 activate
+  neighbor 169.254.1.1 soft-reconfiguration inbound
+
+! Routes for global and VRFs
+ip route 0.0.0.0 0.0.0.0 x.x.x.x 10
+ip route 0.0.0.0 0.0.0.0 y.y.y.y 20
+ip route vrf UPLINK1 0.0.0.0 0.0.0.0 x.x.x.x
+ip route vrf UPLINK2 0.0.0.0 0.0.0.0 y.y.y.y
+```
 
 ### Pilot Setup
 

@@ -1,11 +1,11 @@
 # Where you want the HTTP API and Web UI to listen on
 [http_server]
 listen_ip = ''
-listen_port = 8080
+listen_port = 80
 
 # Your GoBGP instance
 [gobgp]
-address = '192.168.1.1'
+address = '127.0.0.1'
 port = '50051'
 timeout_ms = 1000
 

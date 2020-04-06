@@ -13,6 +13,12 @@ RUN mkdir -p "$GOPATH" \
 FROM python:3-buster
 LABEL maintainer="docker@public.swineson.me"
 
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends supervisor curl \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY . /tmp/pilot
 COPY --from=grpc_interface_builder /pilot/pilot/gobgp_interface /tmp/pilot/pilot/gobgp_interface
 
@@ -21,4 +27,9 @@ RUN cd /tmp/pilot \
     && cd \
     && rm -r /tmp/pilot
 
-CMD [ "pilot_server" ]
+COPY supervisor /etc/supervisor/
+COPY config /etc/pilot/
+
+EXPOSE 80/tcp
+CMD [ "supervisord", "-c", "/etc/supervisor/supervisor.conf", "-n" ]
+

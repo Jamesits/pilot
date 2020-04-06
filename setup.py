@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 with open("README.md", 'r') as f:
     long_description = f.read()
@@ -20,7 +20,7 @@ setup(
     author='James Swineson',
     author_email='pypi@public.swineson.me',
     url="https://github.com/Jamesits/Pilot",
-    packages=find_packages(),
+    packages=find_namespace_packages(),
     install_requires=install_reqs,
     classifiers=[
         "Programming Language :: Python :: 3",

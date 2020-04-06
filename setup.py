@@ -11,19 +11,16 @@ with open('requirements.txt', 'r') as f:
         ] if s != ''
     ]
 
-packages = find_packages()
-print(packages)
-
 setup(
     name='pilot',
     version='0.0.1',
-    description='BGP flowspec based SDN controller at home',
+    description='Simple web-based SDN controller for family and friends',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='James Swineson',
     author_email='pypi@public.swineson.me',
     url="https://github.com/Jamesits/Pilot",
-    packages=packages,
+    packages=find_packages(),
     install_requires=install_reqs,
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -1,4 +1,5 @@
 FROM golang:1-buster as grpc_interface_builder
+ARG DEBIAN_FRONTEND=noninteractive
 ENV GOPATH=/root/go
 
 RUN apt-get update -y \
@@ -11,6 +12,7 @@ RUN mkdir -p "$GOPATH" \
     && ./scripts/build_grpc.sh
 
 FROM debian:buster-slim as gobgp_builder
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y \
     && apt-get install -y wget tar
@@ -22,6 +24,7 @@ RUN wget ${GOBGP_DOWNLOAD_URL} -O gobgp.tar.gz \
 
 FROM python:3-buster
 LABEL maintainer="docker@public.swineson.me"
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends supervisor curl \

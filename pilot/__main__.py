@@ -2,7 +2,7 @@
 import logging
 import os
 
-from flask import Response
+from flask import redirect, url_for
 from gevent.pywsgi import WSGIServer
 
 from pilot import create_app
@@ -43,7 +43,7 @@ app = create_app(os.path.abspath(user_config_file_path))
 
 @app.route("/")
 def __placeholder():
-    return Response("Segmentation fault (core dumped)", status=500)
+    return redirect(url_for("gobgp_web.index"), 302)
 
 
 @app.after_request

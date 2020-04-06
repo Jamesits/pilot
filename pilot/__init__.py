@@ -44,4 +44,4 @@ def register_blueprints(app: Flask) -> None:
     # Since the application instance is now created, register each Blueprint
     # with the Flask application instance (app)
     from pilot.gobgp_web import gobgp_web_blueprint
-    app.register_blueprint(gobgp_web_blueprint, url_prefix="/gobgp")
+    app.register_blueprint(gobgp_web_blueprint, url_prefix="/pilot")

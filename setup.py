@@ -1,10 +1,14 @@
+import os
+
 from setuptools import setup, find_packages
 
-with open("README.md", 'r') as f:
+script_dir = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(script_dir, "README.md"), 'r') as f:
     long_description = f.read()
 
 # https://stackoverflow.com/a/50368460/2646069
-with open('requirements.txt', 'r') as f:
+with open(os.path.join(script_dir, 'requirements.txt'), 'r') as f:
     install_reqs = [
         s for s in [
             line.split('#', 1)[0].strip(' \t\n') for line in f
@@ -14,7 +18,7 @@ with open('requirements.txt', 'r') as f:
 setup(
     name='pilot',
     version='0.0.1',
-    description='Simple web-based SDN controller for family and friends',
+    description='BGP flowspec based SDN controller at home',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='James Swineson',

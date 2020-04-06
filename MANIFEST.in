@@ -3,7 +3,6 @@ exclude .travis.yml
 exclude appveyor.yml
 exclude azure-pipelines.yaml
 exclude pytest.ini
-exclude README.md
 exclude Dockerfile
 prune .*
 prune dist

@@ -1,4 +1,4 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import setup, find_packages
 
 with open("README.md", 'r') as f:
     long_description = f.read()
@@ -11,6 +11,9 @@ with open('requirements.txt', 'r') as f:
         ] if s != ''
     ]
 
+packages = find_packages()
+print(packages)
+
 setup(
     name='pilot',
     version='0.0.1',
@@ -20,7 +23,7 @@ setup(
     author='James Swineson',
     author_email='pypi@public.swineson.me',
     url="https://github.com/Jamesits/Pilot",
-    packages=find_namespace_packages(),
+    packages=packages,
     install_requires=install_reqs,
     classifiers=[
         "Programming Language :: Python :: 3",

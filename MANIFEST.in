@@ -1,4 +1,5 @@
 global-include templates/*
+global-include **/templates/*
 graft pilot/static
 exclude .travis.yml
 exclude appveyor.yml

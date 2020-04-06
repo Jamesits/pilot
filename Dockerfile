@@ -19,13 +19,11 @@ RUN apt-get update -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /tmp/pilot
-COPY --from=grpc_interface_builder /pilot/pilot/gobgp_interface /tmp/pilot/pilot/gobgp_interface
+COPY . /opt/pilot
+COPY --from=grpc_interface_builder /pilot/pilot/gobgp_interface /opt/pilot/pilot/gobgp_interface
 
-RUN cd /tmp/pilot \
-    && python3 setup.py install \
-    && cd \
-    && rm -r /tmp/pilot
+RUN cd /opt/pilot \
+    && python3 setup.py install
 
 COPY supervisor /etc/supervisor/
 COPY config /etc/pilot/

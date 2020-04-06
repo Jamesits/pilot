@@ -1,5 +1,5 @@
-recursive-include pilot/static *
-recursive-include pilot/gobgp_web/templates *
+global-include templates/*
+graft pilot/static
 exclude .travis.yml
 exclude appveyor.yml
 exclude azure-pipelines.yaml

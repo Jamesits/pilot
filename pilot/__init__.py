@@ -26,7 +26,7 @@ def create_app(config_filename: str) -> Flask:
         logger.warning(f"You have no rules defined")
         config['rule'] = []
 
-    app = Flask(__name__, instance_relative_config=False)
+    app = Flask(__name__, instance_relative_config=False, static_url_path='')
     # app.config.from_pyfile(config_filename)
     app.config.update(config)  # from_object or from_mapping doesn't work here
     initialize_extensions(app)

@@ -28,39 +28,23 @@ Router (network gateway):
 * Add BGP session with your GoBGP instance and enable `ipv4 flowspec` and `ipv6 flowspec` address families
 * Allow flowspec rule installation on the interfaces to LAN clients
 
-### GoBGP Setup
-
-A minimal example configuration:
-
-```toml
-[global.config]
-  as = 65540
-  router-id = "192.168.1.1"
-
-[[neighbors]]
-  [neighbors.config]
-    neighbor-address = "your.router.ip.address"
-    peer-as = 65540
-  [[neighbors.afi-safis]]
-    [neighbors.afi-safis.config]
-      afi-safi-name = "ipv4-flowspec"
-  [[neighbors.afi-safis]]
-    [neighbors.afi-safis.config]
-      afi-safi-name = "ipv6-flowspec"
-  [neighbors.apply-policy.config]
-    default-import-policy = "reject-route"
-    default-export-policy = "accept-route"
-```
-
-Details see [GoBGP documentation](https://github.com/osrg/gobgp/blob/master/docs/sources/configuration.md).
-
 ### Pilot Setup
 
-Create a config file ([example](config/pilot.toml)), then spin up the program:
+Download all the files in [config](config) and put them in a directory. 
 
+In `gobgpd.toml`:
+* Change `global.config.as` and `global.config.router-id`
+* Change `neighbors[].config.neighbor-address` and `neighbors[].config.peer-as`
+
+In `pilot.toml`:
+* Add or change `rule`
+
+Then spin up our Docker container:
 ```shell script
-python3 -m pilot --config path/to/pilot.toml
+docker run --restart=always --name=pilot -p 80:80 -v path/to/your/config/directory:/etc/pilot:ro jamesits/pilot:latest
 ```
+
+The web UI will be on port 80.
 
 ## Thanks
 

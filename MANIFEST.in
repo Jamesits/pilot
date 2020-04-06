@@ -8,3 +8,4 @@ prune dist
 prune build
 prune instance
 prune gobgp
+prune assets

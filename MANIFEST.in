@@ -8,6 +8,5 @@ prune .*
 prune dist
 prune build
 prune instance
-prune *.egg-info
 prune gobgp
 prune assets

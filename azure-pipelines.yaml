@@ -29,8 +29,29 @@ jobs:
       submodules: 'recursive'
 
     - bash: |
-        docker build --tag jamesits/pilot:latest .
+        docker build --tag jamesits/pilot:azdevops-autobuild-latest .
       displayName: 'Build'
+
+    - task: Docker@1
+      displayName: "Docker login"
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: "Docker Hub: Jamesits"
+        command: login
+
+    - bash: |
+        docker push jamesits/pilot:azdevops-autobuild-latest
+      displayName: "Docker push"
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+    - task: Docker@1
+      displayName: "Docker logout"
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: "Docker Hub: Jamesits"
+        command: logout
 
   - job: grpc_interface_build
     displayName: "Build GRPC interface"

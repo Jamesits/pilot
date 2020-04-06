@@ -1,6 +1,6 @@
 # Pilot
 
-Simple web-based SDN network controller for family and friends.
+Simple web-based SDN controller for family and friends.
 
 [![Build Status](https://dev.azure.com/nekomimiswitch/General/_apis/build/status/pilot?branchName=master)](https://dev.azure.com/nekomimiswitch/General/_build/latest?definitionId=81&branchName=master)
 

@@ -12,6 +12,7 @@ python3 -m pip install --user -r scripts/grpc-build-requirements.txt
 
 ! rm -rf "${BUILD_DST}"/*.py
 mkdir -p "${BUILD_DST}"
+touch "${BUILD_DST}/__init__.py"
 pushd gobgp
 
 # must first download at least protobuf packages

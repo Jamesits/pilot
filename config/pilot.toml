@@ -6,7 +6,7 @@ listen_port = 80
 # Your GoBGP instance
 [gobgp]
 address = '127.0.0.1'
-port = '50051'
+port = 50051
 timeout_ms = 1000
 
 # Rules; only route_targe is supported by now

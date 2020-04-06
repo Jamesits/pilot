@@ -70,16 +70,26 @@ router bgp 65540
  neighbor 169.254.1.1 remote-as 65540
  address-family ipv4 flowspec
   neighbor 169.254.1.1 activate
-  neighbor 169.254.1.1 soft-reconfiguration inbound
  address-family ipv6 flowspec
   neighbor 169.254.1.1 activate
-  neighbor 169.254.1.1 soft-reconfiguration inbound
 
 ! Routes for global and VRFs
 ip route 0.0.0.0 0.0.0.0 x.x.x.x 10
 ip route 0.0.0.0 0.0.0.0 y.y.y.y 20
 ip route vrf UPLINK1 0.0.0.0 0.0.0.0 x.x.x.x
 ip route vrf UPLINK2 0.0.0.0 0.0.0.0 y.y.y.y
+```
+
+Example configuration for Juniper JunOS (interface configuration left out):
+```
+set policy-options policy-statement accept-all term 1 then accept
+set protocols bgp local-as 65540
+set protocols bgp group flowspec family inet flow no-validate accept-all
+set protocols bgp group flowspec family inet6 flow no-validate accept-all
+set protocols bgp group flowspec neighbor 169.254.1.1 peer-as 65540
+set routing-options flow term-order standard
+# exclude your upstream interfaces:
+# set routing-options flow interface-group [<group-id>] [exclude <group-id>]
 ```
 
 ### Pilot Setup
@@ -95,7 +105,7 @@ In `pilot.toml`:
 
 Then spin up our Docker container:
 ```shell script
-docker run --restart=always --name=pilot -p 80:80 -v path/to/your/config/directory:/etc/pilot:ro jamesits/pilot:latest
+docker run --restart=always --name=pilot --network=host -v path/to/your/config/directory:/etc/pilot:ro jamesits/pilot:latest
 ```
 
 The web UI will be on port 80.

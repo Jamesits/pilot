@@ -104,7 +104,7 @@ In `pilot.toml`:
 * Add or change `rule`
 
 Then spin up our Docker container:
-```shell script
+```shell
 docker run --restart=always --name=pilot --network=host -v path/to/your/config/directory:/etc/pilot:ro jamesits/pilot:latest
 ```
 

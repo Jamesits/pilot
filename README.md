@@ -6,15 +6,16 @@ Simple web-based SDN controller for family and friends.
 
 ## Introduction
 
-Pilot is a frontend of GoBGP. Any device in your LAN can visit Pilot's web interface to easily select their own VRF.
+Pilot is the SDN controller for your home. Once Pilot is set up, any device in your LAN can visit Pilot's web interface to easily select their own VRF.
 
 ![Pilot web interface screenshot](assets/pilot-webui.png)
 
 ## Requirements
 
 Server running Pilot:
-* Python 3.7 or later
-* LAN devices should not go through SNAT/masquerade to access the server
+* Python 3.7 or later (if you don't use the Docker image)
+* GoBGP with gRPC enabled (if you don't use the Docker image)
+* LAN devices should not go through SNAT/masquerade to access the server (for proper IP address detection)
 
 Gateway router:
 * Has VRF-Lite capability
@@ -94,7 +95,7 @@ set routing-options flow term-order standard
 
 ### Pilot Setup
 
-Download all the files in [config](config) and put them in a directory. 
+The easiest way to run Pilot is using the [Docker image](https://hub.docker.com/r/jamesits/pilot). Download all the files in [config](config) and put them in a directory. 
 
 In `gobgpd.toml`:
 * Change `global.config.as` and `global.config.router-id`

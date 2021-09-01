@@ -106,7 +106,7 @@ jobs:
         versionSpec: '$(python.version)'
 
     - bash: |
-        sudo -EH env "PATH=$PATH" python3 -m pip install --upgrade pip setuptools wheel mypy flake8 pytest pytest-cov
+        sudo -EH env "PATH=$PATH" python3 -m pip install --upgrade pip setuptools wheel mypy wemake-python-styleguide pytest pytest-cov
       displayName: 'Install dependencies'
 
     - bash: |

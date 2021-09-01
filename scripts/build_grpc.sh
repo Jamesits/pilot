@@ -13,11 +13,13 @@ python3 -m pip install --user -r scripts/grpc-build-requirements.txt
 ! rm -rf "${BUILD_DST}"/*.py
 mkdir -p "${BUILD_DST}"
 touch "${BUILD_DST}/__init__.py"
-pushd gobgp
 
+# git submodule update --init --recursive
+pushd gobgp
 # must first download at least protobuf packages
 export GO111MODULE=on
-go get -u -d ./...
+#go get -u -d ./...
+go mod download
 PROTOBUF_BASEDIR="$(go list -f '{{ .Dir }}' -m github.com/golang/protobuf)"
 
 echo "Building GRPC interfaces..."

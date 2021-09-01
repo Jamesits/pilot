@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 default_encoder = GoBgpResultEncoder(ensure_ascii=False, sort_keys=True, indent=4 * ' ')
 gobgp_web_blueprint = Blueprint('gobgp_web', __name__, template_folder='templates')
 
+def filter_ip(ip: str) -> str:
+    if ip.startswith('::ffff:'):
+        ip = ip[7:] # simple method to remove the '::ffff:' prefix for IPv6 mapped IPv4 addresses
+    return ip
 
 @gobgp_web_blueprint.route('/')
 def index():
@@ -63,12 +67,12 @@ def index():
     # find ourselves
     current_rule = "default"
     for cooked_route in cooked_routes:
-        if request.remote_addr == cooked_route['network']:
+        if filter_ip(request.remote_addr) == cooked_route['network']:
             current_rule = cooked_route.get('rule_display_name', cooked_route.get('community'))
 
     return render_template(
         'gobgp_web/index.html',
-        ip=request.remote_addr,
+        ip=filter_ip(request.remote_addr),
         current_rule=current_rule,
         rules=app.config['rule'],
         cooked_routes=cooked_routes,
@@ -89,17 +93,17 @@ def flow():
 
 @gobgp_web_blueprint.route('/flow/self', methods=['DELETE'])
 def flow_self_delete():
-    logger.info(f"/flow/self delete: {request.remote_addr}")
-    gobgp_connector.del_route(source_ip=ip_network(request.remote_addr))
+    logger.info(f"/flow/self delete: {filter_ip(request.remote_addr)}")
+    gobgp_connector.del_route(source_ip=ip_network(filter_ip(request.remote_addr)))
     return '', 204
 
 
 @gobgp_web_blueprint.route('/flow/self', methods=['POST'])
 def flow_self_select():
     selected_rule_id = int(request.values['rule'])
-    logger.info(f"/flow/self select: {request.remote_addr} => {selected_rule_id}")
+    logger.info(f"/flow/self select: {filter_ip(request.remote_addr)} => {selected_rule_id}")
     new_route = {
-        'source_ip': ip_network(request.remote_addr),
+        'source_ip': ip_network(filter_ip(request.remote_addr)),
     }
     if 'route_target' in app.config['rule'][selected_rule_id]:
         new_route['route_target'] = app.config['rule'][selected_rule_id]['route_target']

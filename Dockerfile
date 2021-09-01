@@ -22,7 +22,7 @@ ARG GOBGP_DOWNLOAD_URL=https://github.com/osrg/gobgp/releases/download/v2.15.0/g
 RUN wget ${GOBGP_DOWNLOAD_URL} -O gobgp.tar.gz \
     && tar -xvf gobgp.tar.gz
 
-FROM python:3-buster
+FROM python:3.8-buster
 LABEL maintainer="docker@public.swineson.me"
 ARG DEBIAN_FRONTEND=noninteractive
 

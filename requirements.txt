@@ -1,6 +1,6 @@
 gevent
 grpcio
-protobuf
+protobuf~=3.17.3
 flask
 protobuf3-to-dict
 toml

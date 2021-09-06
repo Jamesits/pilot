@@ -81,7 +81,7 @@ ip route vrf UPLINK1 0.0.0.0 0.0.0.0 x.x.x.x
 ip route vrf UPLINK2 0.0.0.0 0.0.0.0 y.y.y.y
 ```
 
-Example configuration for Juniper JunOS (interface configuration left out):
+Example configuration for Juniper Junos OS (interface configuration left out):
 ```
 set policy-options policy-statement accept-all term 1 then accept
 set protocols bgp local-as 65540

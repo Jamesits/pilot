@@ -9,7 +9,7 @@ address = '127.0.0.1'
 port = 50051
 timeout_ms = 1000
 
-# Rules; only route_targe is supported by now
+# Rules; only route_target is supported by now
 [[rule]]
 display_name = "China Telecom"
 route_target = "100:100"
